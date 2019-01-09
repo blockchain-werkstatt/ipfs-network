@@ -20,7 +20,7 @@ setup openshift app:
   tags:
     - vst
   variables:
-    APP: ipfs_network
+    APP: ipfs-network
     IMAGESTREAM_NAME: ipfs_network
     DOCKERHUB_URL: dockerhub.fokus.fraunhofer.de:5000/blockchain/ipfs_network:latest
   before_script:
