@@ -1,0 +1,31 @@
+stages:
+  - register
+  - deploy
+
+register image in registry:
+  image: docker:latest
+  stage: register
+  tags:
+    - openshift
+  services:
+    - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN dockerhub.fokus.fraunhofer.de:5000
+    - docker build -t dockerhub.fokus.fraunhofer.de:5000/blockchain/ipfs_network .
+    - docker push dockerhub.fokus.fraunhofer.de:5000/blockchain/ipfs_network
+
+setup openshift app:
+  image: ebits/openshift-client
+  stage: deploy
+  tags:
+    - vst
+  variables:
+    APP: ipfs_network
+    IMAGESTREAM_NAME: ipfs_network
+    DOCKERHUB_URL: dockerhub.fokus.fraunhofer.de:5000/blockchain/ipfs_network:latest
+  before_script:
+    - oc login "$OPENSHIFT_SERVER" --token="$OKD_TOKEN" --insecure-skip-tls-verify
+  script:
+    - "oc import-image $IMAGESTREAM_NAME --from=$DOCKERHUB_URL --confirm"
+    - "oc get services $APP 2> /dev/null || oc new-app --name=$APP --image-stream=$IMAGESTREAM_NAME"
+    - "oc get routes $APP 2> /dev/null || oc create route edge --service=$APP --hostname=$APP.okd.fokus.fraunhofer.de --insecure-policy=Redirect"
