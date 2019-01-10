@@ -1,3 +1,3 @@
 #!/bin/bash
-ipfs init
-ipfs daemon
+ipfs init --empty-repo || true && ipfs daemon --migrate --enable-gc --enable-pubsub-experiment
+ 
