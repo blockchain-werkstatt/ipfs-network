@@ -21,6 +21,7 @@ EXPOSE 8080
 EXPOSE 8081
 
 RUN mkdir -p /ipfs
+RUN mkdir /.ipfs     
 RUN export IPFS_PATH=/ipfs
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
