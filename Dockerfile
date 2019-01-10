@@ -23,6 +23,4 @@ EXPOSE 8081
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-RUN ipfs init
-
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
