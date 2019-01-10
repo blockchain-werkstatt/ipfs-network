@@ -1,34 +1,32 @@
-# https://github.com/yeasy/docker-ipfs
-#
-# Dockerfile for IPFS (https://ipfs.io/)
-# Data is stored under /root/.ipfs/
+FROM alpine:edge
+
+# Install Go Runtime Dependencies
+# inspiration: https://github.com/stackhub/service-prometheus/blob/master/Dockerfile
+ENV \
+    ALPINE_GLIBC_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download/unreleased/" \
+    GLIBC_PKG="glibc-2.25-r1.apk" \
+    GLIBC_BIN_PKG="glibc-bin-2.25-r1.apk"
+RUN \
+    apk add --update -t deps wget ca-certificates openssl \
+    && apk add --update -t openssl \
+    && cd /tmp \
+    && wget ${ALPINE_GLIBC_URL}${GLIBC_PKG} ${ALPINE_GLIBC_URL}${GLIBC_BIN_PKG} \
+    && apk add --allow-untrusted ${GLIBC_PKG} ${GLIBC_BIN_PKG} \
+    && apk del --purge deps \
+    && rm /tmp/* /var/cache/apk/*
 
 
-FROM golang:1.11
-LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
+# Install and Run IPFS
+ENV IPFS_PATH /ipfs/data
 
-ENV DEBIAN_FRONTEND noninteractive
+ADD go-ipfs_v0.4.8_linux-amd64.tar.gz .
+RUN mv go-ipfs/ipfs /usr/local/bin/ipfs
 
-ENV API_PORT 5002
-ENV GATEWAY_PORT 8080
-ENV SWARM_PORT 4001
+VOLUME $IPFS_PATH
 
-EXPOSE ${SWARM_PORT}
-# This may introduce security risk to expose API_PORT public
-EXPOSE ${API_PORT}
-EXPOSE ${GATEWAY_PORT}
+CMD (/usr/local/bin/ipfs init && \
+	/usr/local/bin/ipfs daemon) || \
+	/usr/local/bin/ipfs daemon
 
-# Install ipfs using ipfs-update and initialize
-RUN go get -u github.com/ipfs/ipfs-update \
-&& ipfs-update install latest \
-&& ipfs init
-
-# config the api endpoint, may introduce security risk to expose API_PORT public
-RUN ipfs config Addresses.API /ip4/0.0.0.0/tcp/${API_PORT}
-
-# config the gateway endpoint
-RUN ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/${GATEWAY_PORT}
-
-# by default, run `ipfs daemon` to start as a running node
-ENTRYPOINT ["ipfs"]
-CMD ["daemon"]
+# Ports for Swarm TCP, Swarm uTP, API, Gateway
+EXPOSE 4001 4002/udp 5001 8080
