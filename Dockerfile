@@ -60,6 +60,8 @@ EXPOSE 8080
 # Swarm Websockets; must be exposed publicly when the node is listening using the websocket transport (/ipX/.../tcp/8081/ws).
 EXPOSE 8081
 
+#Set VI editor
+ENV EDITOR /bin/vi
 # Create the fs-repo directory
 ENV IPFS_PATH /data/ipfs
 RUN mkdir -p $IPFS_PATH \
