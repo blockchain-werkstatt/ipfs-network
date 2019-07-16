@@ -52,13 +52,17 @@ COPY --from=0 /etc/ssl/certs /etc/ssl/certs
 COPY --from=0 /lib/x86_64-linux-gnu/libdl-2.24.so /lib/libdl.so.2
 
 # Swarm TCP; should be exposed to the public
-EXPOSE 4001
+# Disabled because of network traffic and warning
+#EXPOSE 4001
 # Daemon API; must not be exposed publicly but to client services under you control
-EXPOSE 5001
+# Disabled because of network traffic and warning
+#EXPOSE 5001
 # Web Gateway; can be exposed publicly with a proxy, e.g. as https://ipfs.example.org
-EXPOSE 8080
+# Disabled because of network traffic and warning
+#EXPOSE 8080
 # Swarm Websockets; must be exposed publicly when the node is listening using the websocket transport (/ipX/.../tcp/8081/ws).
-EXPOSE 8081
+# Disabled because of network traffic and warning
+#EXPOSE 8081
 
 #Set VI editor
 ENV EDITOR /bin/vi
@@ -82,7 +86,9 @@ ENV IPFS_LOGGING ""
 # This just makes sure that:
 # 1. There's an fs-repo, and initializes one if there isn't.
 # 2. The API and Gateway are accessible from outside the container.
-ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/start_ipfs"]
+# Disabled because of network traffic and warning
+#ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/start_ipfs"]
 
 # Execute the daemon subcommand by default
-CMD ["daemon", "--migrate=true"]
+# Disabled because of network traffic and warning
+#CMD ["daemon", "--migrate=true"]
